@@ -1,0 +1,7 @@
+acl samba_ports {
+	proto tcp dport {137; 138; 139;}
+	proto udp dport {137; 138; 139;}
+}
+acl samba_clients samba_ports {
+	192.168.0.0/16; # local lan
+}

@@ -1,0 +1,11 @@
+acl samba_ports {
+	proto tcp dport {137; 138; 139;}
+	proto udp dport {137; 138; 139;}
+}
+acl samba_clients samba_ports {
+	192.168.1.21;	# Silviu
+	10.1.0.2;		# Luciana
+	127.0.0.1;		# loopback
+	192.168.1.104;	# myself :-|
+	10.1.0.1;		# -"-
+}

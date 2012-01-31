@@ -1,0 +1,14 @@
+acl http_ports proto tcp dport {
+	80;  # http
+}
+acl https_ports proto tcp dport {
+	443;  # http
+}
+acl http_clients http_ports {
+	192.168.1.104; # ourselves
+	141.85.128.52; # shaihulud
+}
+acl https_clients https_ports {
+	192.168.1.104; # ourselves
+	141.85.128.52; # shaihulud
+}

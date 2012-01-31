@@ -1,0 +1,123 @@
+my @rules_stack;
+my %acls;
+my %plugins;
+
+my @current_rule;
+
+my $end_rule;
+sub parse_rule {
+	my $rule = shift;
+	my $scope = "src";
+	$end_rule = 0;
+	my @words = split /\ /, $rule;
+	for my $i (0..$#words) {
+		if ($words[$i] eq "") { next; }
+		my $ret = parse_keyword(\@words, $i);
+		if ($ret != ($i + 1)) { $i = $ret - 1; }
+		if ($end_rule == 1) { return; }
+	}
+}
+
+sub parse_keyword {
+	my ($_wrds, $pos) = @_;
+	my @words = @$_wrds;
+	my $ret = $pos + 1;
+	if ($words[$pos] eq "") { return $ret; }
+	my $rule = join " ", @words;
+	if (in_hash(\%specials, $words[$pos])) {
+		do_special(\@words, $pos);
+	}
+	if (in_hash(\%keywords, $words[$pos])) {
+		my $next = _do_parse_keyword($_wrds, $pos);
+		$ret = $next;
+	}
+	if (in_hash(\%acls, $words[$pos])) {
+		expand_acl($words[$pos], $scope);
+	}
+	if (is_plugin($words[$pos])) {
+		my $procname = "plugin_".$words[$pos];
+		my $tmp = $words[$pos];
+		my ($left, $right) = split /$tmp/, $rule;
+		my @_left = split /\ /, $left;
+		my @_right = split /\ /, $right;
+		&$procname(\@_left, \@_right);
+	}
+	return $ret;
+}
+
+sub do_special {
+	my ($_wrds, $pos) = @_;
+	my @words = @$_wrds;
+	my $procname = $specials{$words[$pos]};
+	&$procname($_wrds, $pos);
+}
+
+sub _do_parse_keyword {
+	my ($_wrds, $pos) = @_;
+	my @words = @$_wrds;
+	my $ret = $pos + 1;
+	if ($words[$pos] eq "") { return $ret; }
+	my $rule = join " ", @words;
+	my $kw = $words[$pos];
+	my @def = $keywords{$kw};
+	for my $i (0..4) {
+		my $_start_args = $pos + 1;
+		my $_end_args = $pos + $def[2][$i];
+		my @arguments = @words[$_start_args..$_end_args];
+		alter_rule($fields[$i], $def[1][$i], $def[0][$i], \@arguments);
+	}
+}
+
+sub end_rule { $end_rule = 1; }
+
+sub alter_rule {
+	my ($field, $operation, $content, $_args) = @_;
+	my @args = @$_args;
+	my $procname = $field;
+	&$procname($operation, $content, $_args);
+}
+
+sub table {
+	
+}
+
+sub op {
+}
+
+sub chain {
+}
+
+sub rules {
+}
+
+sub target {
+}
+
+sub add_acl {
+	
+}
+
+sub append_to_rule {
+}
+
+sub expand_acl {
+}
+
+sub in_hash {
+	my ($_hash, $kw) = @_;
+	my %hash = %$_hash;
+	foreach (keys(%hash)) {
+		if ($kw eq $_) { return $kw; }
+	}
+	return $kw;
+}
+
+sub is_plugin {
+	my $test = shift;
+	foreach (keys(%plugins)) {
+		if ($test eq $_) { 
+			return $_; 
+		}
+	}
+	return "";
+}

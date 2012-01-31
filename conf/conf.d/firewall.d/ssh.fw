@@ -1,0 +1,11 @@
+acl ssh_ports proto tcp dport 22;
+acl ssh_clients ssh_ports {
+	141.85.0.74;		# ?
+	141.85.0.72;		# southpark.pub.ro
+	141.85.128.52;		# shaihulud.bucharest.roedu.net
+	141.85.3.35;		# kerro.ker.ro
+	213.154.141.145;
+	80.97.234.0/24;
+	207.44.168.15;
+	66.39.80.232;
+}

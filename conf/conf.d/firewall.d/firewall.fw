@@ -1,0 +1,102 @@
+options {
+	iptables "/sbin/iptables";
+	plugin_path "/etc/conf.d/firewall.d/plugins";
+	include_path "/etc/conf.d/firewall.d/";
+	clean yes;
+	info yes;
+	warnings yes;
+	resolver yes;
+	get_ip no;
+	default_proto tcp;
+	default_port_dir dst;
+}
+
+# open tcp ports
+acl open_tcp proto tcp dport {
+	9176; 5222; 177; 1; 53; 6881:6889; 35586; 20;
+}
+
+# open udp ports
+acl open_udp proto udp dport {
+	9176; 53;
+}
+
+# skip logging for the following ports
+acl nolog proto udp dport {
+	22986; # anet
+}
+
+include ssh.fw;
+include squid.fw;
+include ftp.fw;
+include http.fw;
+include samba.fw;
+include flood.fw;
+include mysql.fw;
+include masquerade.fw;
+
+policy {
+	INPUT drop;
+	OUTPUT accept;
+}
+
+state {
+	ESTABLISHED;
+	RELATED;
+}
+
+log open_tcp prefix "[fw opentcp]: ";
+log open_udp prefix "[fw openudp]: ";
+
+open_tcp; 		# accept connections to open tcp ports
+open_udp; 		# accept_connections to open udp ports
+
+ssh_clients {		# allowed ssh
+	log prefix "[fw ssh_ok]: ";
+	accept;
+}
+squid_clients { 	# allowed squid
+	log prefix "[fw squid_ok]: ";
+	accept;
+}
+ftp_clients {		# allowed ftp
+	log prefix "[fw ftp_ok]: ";
+	accept;
+}
+http_clients {		# allowed http
+	log prefix "[fw http_ok]: ";
+	accept;
+}
+https_clients {		# allowed http
+	log prefix "[fw https_ok]: ";
+	accept;
+}
+samba_clients {		# allowed samba
+	log prefix "[fw samba_ok]: ";
+	accept;
+}
+mysql_clients {		# allowed mysql
+	log prefix "[fw mysql_ok]: ";
+	accept;
+}
+
+# logging
+
+log ssh_ports limit 5/second prefix "[fw ssh_blocked]: ";
+log ftp_ports limit 5/second prefix "[fw ftp_blocked]: ";
+log http_ports limit 5/second prefix "[fw http_blocked]: ";
+log https_ports limit 5/second prefix "[fw https_blocked]: ";
+log samba_ports limit 5/second prefix "[fw samba_blocked]: ";
+log mysql_ports limit 5/second prefix "[fw mysql_blocked]: ";
+
+nolog drop;
+
+log limit 5/second prefix "[fw drop]: ";
+
+masqed_clients {
+	log prefix "[fw forw_ok]: ";
+	masq;
+}
+
+forw drop;
+drop;
