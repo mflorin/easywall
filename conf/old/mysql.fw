@@ -1,4 +1,0 @@
-acl mysql_ports proto tcp dport 3306;
-acl mysql_clients mysql_ports {
-	127.0.0.1; # localhost
-}

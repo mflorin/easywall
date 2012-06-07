@@ -1,8 +1,0 @@
-in proto icmp limit 12/hour burst 1 log {
-	icmp-type echo-request prefix "[fw flood ping]: ";
-	icmp-type destination-unreachable prefix "[fw flood icmp-unreach]: ";
-	icmp-type source-quench prefix "[fw flood source-quench]: ";
-	icmp-type time-exceeded prefix "[fw flood time-exceeded]: ";
-	icmp-type parameter-problem prefix "[fw flood param-problem]: ";
-}
-
