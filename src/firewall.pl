@@ -2,8 +2,8 @@
 
 use Getopt::Std;
 
-$plugin_path = "/home/mflorin/bin/firewall/plugins";
-$inc_path = "/home/mflorin/bin/firewall/inc";
+$plugin_path = "plugins";
+$inc_path = "inc";
 
 require "$inc_path/readfile.inc.pl";
 require "$inc_path/parser.inc.pl";
